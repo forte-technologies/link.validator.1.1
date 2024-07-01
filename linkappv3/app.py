@@ -43,9 +43,16 @@ def check_links():
     invalid_links = []
     links_with_articles = []
 
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+    }
+
     for url in urls[:100]:  # Limit to first 100 URLs for safety
+        if not (url.startswith('http://') or url.startswith('https://')):
+            url = 'https://' + url
+
         try:
-            response = requests.get(url, timeout=5)
+            response = requests.get(url, headers=headers, timeout=10, allow_redirects=True)
             if response.status_code == 200:
                 valid_links.append(url)
                 soup = BeautifulSoup(response.content, 'html.parser')
