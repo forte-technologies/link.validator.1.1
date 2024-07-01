@@ -20,10 +20,10 @@ def has_significant_content(soup):
         text = main_content.get_text(separator=' ', strip=True)
     else:
         text = soup.get_text(separator=' ', strip=True)
-    
+
     words = text.split()
     word_count = len(words)
-    
+
     logger.info(f"Word count: {word_count}")
     return word_count > 300
 
@@ -36,13 +36,13 @@ def check_links():
     urls = request.form['urls'].split()
     if not urls:
         return jsonify({"error": "No URLs provided"}), 400
-    
+
     logger.info(f"Received request to check {len(urls)} URLs")
-    
+
     valid_links = []
     invalid_links = []
     links_with_articles = []
-    
+
     for url in urls[:100]:  # Limit to first 100 URLs for safety
         try:
             response = requests.get(url, timeout=5)
@@ -56,7 +56,7 @@ def check_links():
         except requests.RequestException as e:
             logger.error(f"Error checking URL {url}: {str(e)}")
             invalid_links.append(url)
-    
+
     data = {
         "Valid Links Count": [len(valid_links)],
         "Invalid Links Count": [len(invalid_links)],
@@ -65,12 +65,12 @@ def check_links():
         "Invalid Links": [', '.join(invalid_links)],
         "Links with Articles": [', '.join(links_with_articles)],
     }
-    
+
     df = pd.DataFrame(data)
     output = BytesIO()
     df.to_csv(output, index=False, encoding='utf-8')
     output.seek(0)
-    
+
     return send_file(
         output,
         mimetype='text/csv',
